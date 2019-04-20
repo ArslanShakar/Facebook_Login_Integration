@@ -1,8 +1,13 @@
 package com.practice.loginwithfacebook;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,6 +25,8 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,11 +43,15 @@ public class MainActivity extends AppCompatActivity {
 
         initViews();
 
+        /*LoginManager.getInstance().logOut();*/
+
         callbackManager = CallbackManager.Factory.create();
 
         loginButton.setReadPermissions(Arrays.asList("email", "public_profile"));
 
         checkLoggedInStatus();
+
+        printKeyHash();
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -62,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onError(FacebookException e) {
                 tvResult.setText(R.string.login_failed);
+                Log.d("MyTag", e.toString());
             }
         });
     }
@@ -69,8 +81,8 @@ public class MainActivity extends AppCompatActivity {
     /********************  onActivityResult  ***********************/
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     /********************  init views  ***********************/
@@ -153,4 +165,36 @@ public class MainActivity extends AppCompatActivity {
             loadUserProfile(AccessToken.getCurrentAccessToken());
         }
     }
+
+    private void printKeyHash() {
+        // Add code to print out the key hash
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo("com.practice.loginwithfacebook", PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e("KeyHash:", e.toString());
+        } catch (NoSuchAlgorithmException e) {
+            Log.e("KeyHash:", e.toString());
+        }
+    }
 }
+
+/*
+
+C:\Program Files\Java\jdk1.8.0_40\bin>
+*   (1)
+keytool -exportcert -alias androiddebugkey -keystore "C:\Users\Let\.android\debug.keystore" | "E:\Android_Setups\openssl\bin\openssl" sha1 -binary | "E:\Android_Setups\openssl\bin\openssl" base64
+
+
+
+   (2)
+keytool -exportcert -alias YOUR_RELEASE_KEY_ALIAS -keystore YOUR_RELEASE_KEY_PATH | openssl sha1 -binary | openssl base64
+
+keytool -exportcert -alias androiddebugkey -keystore C:\Users\Let\.android\debug.keystore | "E:\Android_Setups\openssl\bin\openssl" sha1 -binary | "E:\Android_Setups\openssl\bin\openssl" base64
+
+Generated Key  : q1J9IkvaVrdPFD9UzXLxcybXtKY=
+*/
