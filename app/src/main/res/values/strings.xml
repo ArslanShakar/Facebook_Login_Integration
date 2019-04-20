@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">LoginWithFacebook</string>
+    <string name="facebook_app_id">2086039138355385</string>
+    <string name="fb_login_protocol_scheme">fb2086039138355385</string>
+    <string name="login_with_facebook">Login With Facebook</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="user_facebook_email">User Facebook Email</string>
+    <string name="profile_image">profile_image</string>
+    <string name="login_attempt_canceled">Login attempt canceled.</string>
+    <string name="login_failed">Login attempt failed.</string>
+    <string name="user_id">User ID:</string>
+    <string name="auth_token">Auth Token:</string>
+    <string name="please_login">Please Login with Facebook!</string>
+</resources>
